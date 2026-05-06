@@ -505,8 +505,8 @@ header h1{font-family:'Playfair Display',serif;font-size:1.25rem;display:flex;al
 //  COSTANTI
 // ══════════════════════════════════════════
 var DB_KEY = 'fragole_v3';
-var DB_VERSION = 'v11_iframe';
-var DRIVE_URL = 'https://script.google.com/macros/s/AKfycbxyHvKNieniJebh3DNSfIY9nb7WdQ95Fd5C8FR7HRiBEq3--fS6Lw2s6No_6frsEHqUvA/exec';
+var DB_VERSION = 'v12_github';
+var DRIVE_URL = 'https://script.google.com/macros/s/AKfycby4NAoDmJzv7JslvHxdSoXBeONVyho_xygbSPeBfRA-t3jae5dZGSJnCUVFRp4IP02_VA/exec';
 var CHECKS = ['profumo','dolce','acida','croccante','succosa','polpa','uniforme','lucida'];
 var TRIFIELDS = ['vigoria','resistenza','produttivita','conservabilita','trasportabilita','maturazione'];
 var TRI_LBL = {
@@ -592,37 +592,17 @@ function syncToDrive(data) {
     }
     var count = parsed.length;
     var encoded = btoa(unescape(encodeURIComponent(data)));
-
-    // Rimuovi iframe e form precedenti
-    var oldIframe = document.getElementById('drive-iframe');
-    if (oldIframe) oldIframe.parentNode.removeChild(oldIframe);
-    var oldForm = document.getElementById('drive-form');
-    if (oldForm) oldForm.parentNode.removeChild(oldForm);
-
-    // Crea iframe nascosto come target
-    var iframe = document.createElement('iframe');
-    iframe.id = 'drive-iframe';
-    iframe.name = 'drive-iframe';
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-
-    // Crea form che punta all'iframe
-    var form = document.createElement('form');
-    form.id = 'drive-form';
-    form.method = 'POST';
-    form.action = DRIVE_URL;
-    form.target = 'drive-iframe';
-    form.style.display = 'none';
-
-    var input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'data';
-    input.value = encoded;
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-
-    showDriveStatus('✅ Salvato su Drive (' + count + ' varietà)');
+    var body = 'data=' + encodeURIComponent(encoded);
+    fetch(DRIVE_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body
+    }).then(function() {
+      showDriveStatus('✅ Salvato su Drive (' + count + ' varietà)');
+    }).catch(function(err) {
+      showDriveStatus('⚠️ Drive non raggiungibile');
+    });
   } catch(e) {
     showDriveStatus('⚠️ Errore: ' + e.message);
   }
@@ -631,7 +611,7 @@ function syncToDrive(data) {
 function loadFromDrive() {
   if (!DRIVE_URL) return;
   showDriveStatus('🔄 Caricamento da Drive...');
-  fetch(DRIVE_URL + '?t=' + Date.now(), { method: 'GET', mode: 'cors' })
+  fetch(DRIVE_URL + '?t=' + Date.now(), { method: 'GET' })
     .then(function(r) { return r.text(); })
     .then(function(text) {
       if (!text || text === '[]') {

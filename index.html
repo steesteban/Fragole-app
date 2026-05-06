@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🍓 Fragole</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fragole 🍓">
+<meta name="theme-color" content="#922b21">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23922b21'/%3E%3Ctext y='.9em' font-size='72' x='12'%3E🍓%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23922b21'/%3E%3Ctext y='.9em' font-size='72' x='12'%3E🍓%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#c0392b;--red-dark:#922b21;
+  --leaf:#2d6a4f;--leaf-light:#52b788;
+  --bg:#f7f0e8;--card:#fffdf9;--border:#e8ddd4;
+  --text:#2c1810;--muted:#9e8b82;--warm:#8c7b72;
+  --shadow:0 4px 24px rgba(44,24,16,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* HEADER */
+header{background:var(--red-dark);color:#fff;padding:14px 16px;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+header h1{font-family:'Playfair Display',serif;font-size:1.25rem;display:flex;align-items:center;gap:8px}
+.badge{background:rgba(255,255,255,.2);font-size:.7rem;padding:2px 8px;border-radius:20px;font-weight:700}
+.hbtns{display:flex;gap:6px}
+.hbtn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:9px;padding:7px 12px;
+  font-size:.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* SEARCH */
+.searchbar{padding:12px 16px 6px;position:sticky;top:52px;z-index:90;background:var(--bg)}
+.sw{position:relative}
+.searchbar input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--border);border-radius:11px;
+  font-size:.92rem;background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;outline:none}
+.searchbar input:focus{border-color:var(--red)}
+.si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.countbar{text-align:center;font-size:.72rem;color:var(--muted);padding:4px 0 0;font-weight:500}
+
+/* CARD LIST */
+.card-list{padding:10px 16px 90px;display:flex;flex-direction:column;gap:11px}
+.vc{background:var(--card);border-radius:15px;border:1.5px solid var(--border);
+  box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:transform .15s}
+.vc:active{transform:scale(.98)}
+.vc-head{display:flex;align-items:center;padding:13px 14px 11px;border-bottom:1px solid var(--border);gap:10px}
+.vc-thumb{width:50px;height:50px;border-radius:9px;background:#f0e9e1;display:flex;align-items:center;
+  justify-content:center;font-size:1.5rem;flex-shrink:0;overflow:hidden}
+.vc-thumb img{width:100%;height:100%;object-fit:cover;border-radius:9px}
+.vc-info{flex:1;min-width:0}
+.vc-name{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--red-dark);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vc-meta{font-size:.72rem;color:var(--muted);margin-top:2px}
+.vc-avg{font-size:.8rem;font-weight:700;color:var(--leaf);margin-top:3px}
+.vc-tags{display:flex;flex-wrap:wrap;gap:5px;padding:9px 14px 11px}
+.tag{font-size:.68rem;padding:2px 9px;border-radius:20px;font-weight:600}
+.tg{background:#d8f3dc;color:#1b4332}
+.vc-note{font-size:.78rem;color:var(--muted);padding:0 14px 11px;font-style:italic;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.empty{text-align:center;padding:60px 30px;color:var(--muted)}
+.empty span{font-size:3rem;display:block;margin-bottom:12px}
+
+/* FAB */
+.fab{position:fixed;bottom:24px;right:18px;background:var(--red);color:#fff;border:none;
+  border-radius:16px;padding:14px 20px;font-size:.95rem;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 20px rgba(192,57,43,.45);display:flex;align-items:center;gap:7px;
+  font-family:'DM Sans',sans-serif;z-index:200}
+.fab2{background:var(--leaf)}
+
+/* VIEWS */
+.view{display:none}
+.view.active{display:block}
+
+/* DETAIL */
+.dw{padding:14px 16px 100px;max-width:640px;margin:0 auto}
+.dtop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.dname{font-family:'Playfair Display',serif;font-size:1.45rem;color:var(--red-dark)}
+.dsub{font-size:.78rem;color:var(--muted);margin-top:2px}
+.dbtns{display:flex;gap:6px;flex-shrink:0;padding-top:4px}
+.sml{background:none;border:1.5px solid var(--border);border-radius:7px;padding:5px 11px;
+  font-size:.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--muted)}
+.sml.del{border-color:#f5c6cb;color:var(--red)}
+
+.sl{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin:18px 0 9px;border-bottom:1px solid var(--border);padding-bottom:4px}
+
+/* AVG BOX */
+.avg-box{background:linear-gradient(135deg,#1b4332,#2d6a4f);color:#fff;border-radius:13px;
+  padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.avg-num{font-size:2.2rem;font-weight:700;font-family:'Playfair Display',serif}
+.avg-lbl{font-size:.73rem;font-weight:600;opacity:.8}
+.avg-stars{font-size:1.2rem;margin-top:2px}
+.avg-det{font-size:.7rem;opacity:.7;margin-top:2px}
+.avg-peso{font-size:.78rem;font-weight:600;margin-top:4px;opacity:.85}
+
+/* RILIEVO CARDS */
+.rh{display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px;
+  border-bottom:1px solid var(--border);padding-bottom:4px}
+.rh-title{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.btn-add-r{background:var(--leaf);color:#fff;border:none;border-radius:9px;
+  padding:7px 14px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+.rc{background:#fff;border:1.5px solid var(--border);border-radius:12px;margin-bottom:9px;overflow:hidden}
+.rc-head{display:flex;align-items:flex-start;justify-content:space-between;padding:10px 14px;
+  border-bottom:1px solid var(--border);background:#fafaf7;gap:8px}
+.rc-date{font-size:.83rem;font-weight:700;color:var(--text)}
+.rc-rating{font-size:.82rem;margin-top:2px}
+.rc-acts{display:flex;gap:5px;flex-shrink:0}
+.rc-body{padding:10px 14px}
+.rc-row{display:flex;gap:14px;margin-bottom:5px;flex-wrap:wrap}
+.kv{font-size:.78rem}
+.kv .k{color:var(--muted);font-weight:600}
+.rc-note{font-size:.78rem;color:var(--muted);font-style:italic;margin-top:4px}
+.rc-checks{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.rc-photos{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.rc-photos img{width:60px;height:60px;object-fit:cover;border-radius:8px;
+  border:1.5px solid var(--border);cursor:pointer}
+.tri-disp{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.tri-di{background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:7px 10px;
+  display:flex;justify-content:space-between;align-items:center}
+.tri-di .tl{font-size:.72rem;font-weight:600;color:var(--warm)}
+.tv{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:11px}
+.tv.y{background:#d8f3dc;color:#1b4332}
+.tv.n{background:#f8d7da;color:#842029}
+.tv.m{background:#fff3cd;color:#664d03}
+
+/* FORMS */
+.fw{padding:14px 16px 110px;max-width:640px;margin:0 auto}
+.ftitle{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--red-dark);
+  margin-bottom:15px;display:flex;align-items:center;gap:8px}
+.fl{margin-bottom:12px}
+.fl label{display:block;font-size:.8rem;font-weight:600;color:var(--warm);margin-bottom:4px}
+.fl input,.fl textarea,.fl select{
+  width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;
+  font-size:.93rem;background:#fff;color:var(--text);font-family:'DM Sans',sans-serif;
+  outline:none;-webkit-appearance:none}
+.fl input:focus,.fl textarea:focus,.fl select:focus{border-color:var(--red)}
+.fl textarea{min-height:75px;resize:vertical}
+.row2{display:flex;gap:10px}
+.row2 .fl{flex:1}
+
+.sl2{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin:16px 0 9px;border-bottom:1px solid var(--border);padding-bottom:4px}
+
+/* RATING */
+.rrow{display:flex;gap:6px}
+.rb{flex:1;padding:10px 0;border:1.5px solid var(--border);border-radius:9px;background:#fff;
+  cursor:pointer;font-size:1rem;text-align:center;transition:all .12s;line-height:1.2}
+.rb.on{background:#fff3cd;border-color:#f6c94e}
+
+/* CHECKS */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ci{display:flex;align-items:center;gap:9px;background:#fff;border:1.5px solid var(--border);
+  border-radius:10px;padding:9px 11px;cursor:pointer;user-select:none;transition:all .12s}
+.ci input{display:none}
+.cm{width:21px;height:21px;border:2px solid var(--border);border-radius:5px;background:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;transition:all .12s}
+.ci input:checked~.cm{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.ci input:checked~.cm::after{content:'✓'}
+.clbl{font-size:.8rem;font-weight:500;line-height:1.2}
+.ci:has(input:checked){border-color:var(--leaf-light);background:#f0faf4}
+
+/* TRISTATE */
+.tg2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ti{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:9px 11px}
+.ti .tl2{font-size:.73rem;font-weight:600;color:var(--warm);margin-bottom:6px;display:block}
+.tbs{display:flex;gap:4px}
+.tb{flex:1;padding:6px 0;border:1.5px solid var(--border);border-radius:6px;background:#fff;
+  font-size:.7rem;font-weight:700;cursor:pointer;transition:all .12s;
+  font-family:'DM Sans',sans-serif;color:var(--muted)}
+.tb.y.on{background:#d8f3dc;border-color:#52b788;color:#1b4332}
+.tb.n.on{background:#f8d7da;border-color:#e74c3c;color:#842029}
+.tb.m.on{background:#fff3cd;border-color:#f6c94e;color:#664d03}
+
+/* PHOTO */
+.pa{border:2px dashed var(--border);border-radius:12px;padding:16px;text-align:center;
+  background:#fff;cursor:pointer;transition:all .2s}
+.pa:hover{border-color:var(--red);background:#fff8f6}
+.pa p{font-size:.78rem;color:var(--muted);margin-top:4px}
+.pp{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.ptw{position:relative;display:inline-block}
+.pth{width:66px;height:66px;border-radius:9px;object-fit:cover;border:2px solid var(--border)}
+.pdel{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border:none;
+  border-radius:50%;width:19px;height:19px;font-size:.65rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+
+/* FORM ACTIONS */
+.fa{display:flex;gap:8px;margin-top:20px}
+.bsave{flex:1;background:var(--red);color:#fff;border:none;border-radius:12px;padding:14px;
+  font-size:.93rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.bsave.g{background:var(--leaf)}
+.bback{background:#fff;color:var(--muted);border:1.5px solid var(--border);border-radius:12px;
+  padding:14px 16px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.bdel{background:#fff;color:#c0392b;border:1.5px solid #f5c6cb;border-radius:12px;
+  padding:14px 14px;font-size:.88rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+
+/* LIGHTBOX */
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;
+  display:none;align-items:center;justify-content:center}
+.lb.open{display:flex}
+.lb img{max-width:95vw;max-height:90vh;border-radius:10px;object-fit:contain}
+.lb-x{position:absolute;top:16px;right:18px;color:#fff;font-size:1.8rem;cursor:pointer}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#1b4332;color:#fff;padding:10px 22px;border-radius:28px;
+  font-size:.85rem;font-weight:700;opacity:0;transition:all .3s;
+  z-index:999;white-space:nowrap;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* FOOTER */
+.foot{text-align:center;padding:8px 0 4px;font-size:.63rem;color:var(--muted);
+  font-style:italic;border-top:1px solid var(--border);margin-top:12px}
+
+@media(min-width:520px){
+  .cg{grid-template-columns:1fr 1fr 1fr}
+  .tg2{grid-template-columns:1fr 1fr 1fr}
+  .tri-disp{grid-template-columns:1fr 1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍓 Fragole <span class="badge" id="hbadge">0</span></h1>
+  <div class="hbtns">
+    <button class="hbtn" onclick="loadFromDrive()" title="Carica da Drive">☁️</button>
+    <button class="hbtn" onclick="doExport()">⬇ Esporta</button>
+    <button class="hbtn" onclick="document.getElementById('fimp').click()">⬆ Importa</button>
+    <input type="file" id="fimp" accept=".json" style="display:none">
+  </div>
+</header>
+<div id="drive-status" style="
+  position:fixed;top:52px;left:0;right:0;z-index:99;
+  background:#1b4332;color:#fff;text-align:center;
+  font-size:.75rem;font-weight:600;padding:5px;
+  opacity:0;transition:opacity .5s;pointer-events:none;
+"></div>
+
+<!-- ═══ LISTA ═══ -->
+<div id="v-list" class="view active">
+  <div class="searchbar">
+    <div class="sw">
+      <span class="si">🔍</span>
+      <input type="text" id="search" placeholder="Cerca varietà…" oninput="renderList()">
+    </div>
+    <div class="countbar" id="countbar"></div>
+  </div>
+  <div class="card-list" id="card-list"></div>
+  <div class="empty" id="empty" style="display:none">
+    <span>🍓</span>Nessuna varietà ancora.<br>Premi <strong>+ Nuova</strong> per iniziare!
+  </div>
+  <div class="foot" id="list-foot" style="display:none;margin:0 16px 70px">
+    💡 da un'idea di Stefano Stefanini
+  </div>
+  <button class="fab" onclick="openNewVarieta()">＋ Nuova varietà</button>
+</div>
+
+<!-- ═══ DETTAGLIO ═══ -->
+<div id="v-detail" class="view">
+  <div class="dw">
+    <div class="dtop">
+      <div>
+        <div class="dname" id="d-name"></div>
+        <div class="dsub" id="d-sub"></div>
+      </div>
+      <div class="dbtns">
+        <button class="sml" id="d-edit">✏️ Modifica</button>
+        <button class="sml del" id="d-del">🗑</button>
+      </div>
+    </div>
+
+    <div class="avg-box" id="d-avg" style="display:none">
+      <div>
+        <div class="avg-lbl">Media su tutti i rilievi</div>
+        <div class="avg-stars" id="d-avgstars"></div>
+        <div class="avg-det" id="d-avgdet"></div>
+        <div class="avg-peso" id="d-avgpeso"></div>
+        <div class="avg-peso" id="d-avgbrix"></div>
+        <div class="avg-peso" id="d-avgdurezza"></div>
+        <div class="avg-peso" id="d-avgpesomedio"></div>
+        <div class="avg-peso" id="d-avgprodcum"></div>
+        <div class="avg-peso" id="d-avgconsistenza"></div>
+      </div>
+      <div class="avg-num" id="d-avgnum"></div>
+    </div>
+
+    <div class="rh">
+      <div class="rh-title">📅 Rilievi nel tempo</div>
+      <button class="btn-add-r" id="d-addrilievo">＋ Aggiungi rilievo</button>
+    </div>
+    <div id="d-rilievi"></div>
+    <div class="foot" style="margin-top:14px">💡 da un'idea di Stefano Stefanini</div>
+  </div>
+  <button class="fab" onclick="goList()">← Lista</button>
+</div>
+
+<!-- ═══ FORM VARIETÀ (solo Nome + Codice) ═══ -->
+<div id="v-varform" class="view">
+  <div class="fw">
+    <div class="ftitle"><span id="vf-icon">📋</span> <span id="vf-title">Nuova Varietà</span></div>
+
+    <div class="fl">
+      <label>Nome varietà *</label>
+      <input type="text" id="vf-name" placeholder="es. Candonga, Alba, Portola…">
+    </div>
+    <div class="fl">
+      <label>Codice / ID (Parc.)</label>
+      <input type="text" id="vf-code" placeholder="es. 45">
+    </div>
+    <div class="row2">
+      <div class="fl"><label>Fila</label>
+        <input type="text" id="vf-fila" placeholder="es. 10"></div>
+      <div class="fl"><label>Destino campo</label>
+        <input type="text" id="vf-destino" placeholder="es. FC"></div>
+    </div>
+    <div class="row2">
+      <div class="fl"><label>N° piante</label>
+        <input type="number" id="vf-npiante" placeholder="es. 6" min="0"></div>
+      <div class="fl"><label>Genitori</label>
+        <input type="text" id="vf-genitori" placeholder="es. FC 16,071,04 x Fc 10,240,08"></div>
+    </div>
+    <div class="fl"><label>Note campo</label>
+      <input type="text" id="vf-notecampo" placeholder="es. morta, parzialmente morta…"></div>
+
+    <div class="fa">
+      <button class="bback" id="vf-back">← Indietro</button>
+      <button class="bsave" id="vf-save">💾 Salva varietà</button>
+      <button class="bdel" id="vf-del" style="display:none">🗑</button>
+    </div>
+    <div class="foot" style="margin-top:14px">💡 da un'idea di Stefano Stefanini</div>
+  </div>
+</div>
+
+<!-- ═══ FORM RILIEVO ═══ -->
+<div id="v-rilform" class="view">
+  <div class="fw">
+    <div class="ftitle">📅 <span id="rf-title">Nuovo Rilievo</span></div>
+
+    <div class="sl2">Data e operatore</div>
+    <div class="row2">
+      <div class="fl"><label>Data *</label>
+        <input type="date" id="rf-date"></div>
+      <div class="fl"><label>Operatore</label>
+        <input type="text" id="rf-op" placeholder="Chi ha rilevato"></div>
+    </div>
+
+    <div class="sl2">Valutazione del giorno</div>
+    <div class="rrow" id="rf-rrow">
+      <button class="rb" data-v="1">🍓</button>
+      <button class="rb" data-v="2">🍓🍓</button>
+      <button class="rb" data-v="3">🍓🍓🍓</button>
+      <button class="rb" data-v="4">🍓🍓🍓🍓</button>
+      <button class="rb" data-v="5">🍓🍓🍓🍓🍓</button>
+    </div>
+
+    <div class="sl2">Peso raccolto e misurazioni</div>
+    <div class="row2">
+      <div class="fl"><label>Peso totale (g)</label>
+        <input type="number" id="rf-peso" placeholder="es. 2500" min="0" step="10"></div>
+      <div class="fl"><label>Grado Brix (°Bx)</label>
+        <input type="number" id="rf-brix" placeholder="es. 9.5" min="0" step="0.1"></div>
+    </div>
+    <div class="row2">
+      <div class="fl"><label>Durezza (kg/cm²)</label>
+        <input type="number" id="rf-durezza" placeholder="es. 3.2" min="0" step="0.1"></div>
+      <div class="fl"><label>Peso medio frutto (g)</label>
+        <input type="number" id="rf-pesomedio" placeholder="es. 27.2" min="0" step="0.1"></div>
+    </div>
+    <div class="row2">
+      <div class="fl"><label>Produzione cumulata (g/pianta)</label>
+        <input type="number" id="rf-prodcum" placeholder="es. 531" min="0" step="1"></div>
+      <div class="fl"><label>Indice precocità (data)</label>
+        <input type="date" id="rf-precocita"></div>
+    </div>
+    <div class="row2">
+      <div class="fl"><label>Consistenza polpa (g)</label>
+        <input type="number" id="rf-consistenza" placeholder="es. 491" min="0" step="1"></div>
+      <div class="fl"><label>Vivaio</label>
+        <input type="text" id="rf-vivaio" placeholder="es. Vivaio Rossi"></div>
+    </div>
+    <div class="fl"><label>Genitori</label>
+      <input type="text" id="rf-genitori" placeholder="es. FC 16,071,04 x Fc 10,240,08"></div>
+
+    <div class="sl2">Morfologia frutto</div>
+    <div class="row2">
+      <div class="fl"><label>Forma</label>
+        <select id="rf-forma">
+          <option value="">— —</option>
+          <option>Conica</option><option>Conica allungata</option>
+          <option>Globosa</option><option>Cilindrica</option>
+          <option>Reniforme</option><option>Irregolare</option>
+        </select></div>
+      <div class="fl"><label>Colore buccia</label>
+        <select id="rf-colore">
+          <option value="">— —</option>
+          <option>Rosso brillante</option><option>Rosso scuro</option>
+          <option>Rosso aranciato</option><option>Rosa chiaro</option>
+          <option>Rosso uniforme</option><option>Bicolore</option>
+        </select></div>
+    </div>
+    <div class="fl"><label>Dimensione media</label>
+      <select id="rf-dim">
+        <option value="">— —</option>
+        <option>Molto piccola (&lt;10g)</option><option>Piccola (10-15g)</option>
+        <option>Media (15-20g)</option><option>Grande (20-30g)</option>
+        <option>Molto grande (&gt;30g)</option>
+      </select></div>
+
+    <div class="sl2">Stadio e condizione</div>
+    <div class="row2">
+      <div class="fl"><label>Stadio maturazione</label>
+        <select id="rf-stadio">
+          <option value="">— —</option>
+          <option>Accenno di colore</option><option>50% colorato</option>
+          <option>75% colorato</option><option>Piena maturazione</option>
+          <option>Sovrammaturo</option>
+        </select></div>
+      <div class="fl"><label>Condizione frutto</label>
+        <select id="rf-cond">
+          <option value="">— —</option>
+          <option>Ottima</option><option>Buona</option>
+          <option>Discreta</option><option>Problematica</option>
+        </select></div>
+    </div>
+
+    <div class="sl2">Caratteristiche organolettiche</div>
+    <div class="cg">
+      <label class="ci"><input type="checkbox" id="rc-profumo"><span class="cm"></span><span class="clbl">🌸 Profumata</span></label>
+      <label class="ci"><input type="checkbox" id="rc-dolce"><span class="cm"></span><span class="clbl">🍯 Molto dolce</span></label>
+      <label class="ci"><input type="checkbox" id="rc-acida"><span class="cm"></span><span class="clbl">🍋 Acidula</span></label>
+      <label class="ci"><input type="checkbox" id="rc-croccante"><span class="cm"></span><span class="clbl">💪 Croccante</span></label>
+      <label class="ci"><input type="checkbox" id="rc-succosa"><span class="cm"></span><span class="clbl">💧 Succosa</span></label>
+      <label class="ci"><input type="checkbox" id="rc-polpa"><span class="cm"></span><span class="clbl">❤️ Polpa rossa</span></label>
+      <label class="ci"><input type="checkbox" id="rc-uniforme"><span class="cm"></span><span class="clbl">📐 Uniforme</span></label>
+      <label class="ci"><input type="checkbox" id="rc-lucida"><span class="cm"></span><span class="clbl">✨ Buccia lucida</span></label>
+    </div>
+
+    <div class="sl2">Attitudini agronomiche</div>
+    <div class="tg2" id="rf-trizone">
+      <div class="ti"><span class="tl2">Vigoria pianta</span><div class="tbs">
+        <button class="tb y" data-f="vigoria" data-v="y">Alta</button>
+        <button class="tb m" data-f="vigoria" data-v="m">Med</button>
+        <button class="tb n" data-f="vigoria" data-v="n">Bassa</button></div></div>
+      <div class="ti"><span class="tl2">Resist. malattie</span><div class="tbs">
+        <button class="tb y" data-f="resistenza" data-v="y">Alta</button>
+        <button class="tb m" data-f="resistenza" data-v="m">Med</button>
+        <button class="tb n" data-f="resistenza" data-v="n">Bassa</button></div></div>
+      <div class="ti"><span class="tl2">Produttività</span><div class="tbs">
+        <button class="tb y" data-f="produttivita" data-v="y">Alta</button>
+        <button class="tb m" data-f="produttivita" data-v="m">Med</button>
+        <button class="tb n" data-f="produttivita" data-v="n">Bassa</button></div></div>
+      <div class="ti"><span class="tl2">Conservabilità</span><div class="tbs">
+        <button class="tb y" data-f="conservabilita" data-v="y">Alta</button>
+        <button class="tb m" data-f="conservabilita" data-v="m">Med</button>
+        <button class="tb n" data-f="conservabilita" data-v="n">Bassa</button></div></div>
+      <div class="ti"><span class="tl2">Trasportabilità</span><div class="tbs">
+        <button class="tb y" data-f="trasportabilita" data-v="y">Alta</button>
+        <button class="tb m" data-f="trasportabilita" data-v="m">Med</button>
+        <button class="tb n" data-f="trasportabilita" data-v="n">Bassa</button></div></div>
+      <div class="ti"><span class="tl2">Maturazione</span><div class="tbs">
+        <button class="tb y" data-f="maturazione" data-v="y">Precoce</button>
+        <button class="tb m" data-f="maturazione" data-v="m">Media</button>
+        <button class="tb n" data-f="maturazione" data-v="n">Tardiva</button></div></div>
+    </div>
+
+    <div class="sl2">Note del rilievo</div>
+    <div class="fl"><textarea id="rf-note" placeholder="Anomalie, parassiti, clima, confronti…"></textarea></div>
+    <div class="fl"><label>Potenziale commerciale</label>
+      <select id="rf-comm">
+        <option value="">— —</option>
+        <option>Scarso</option><option>Discreto</option>
+        <option>Buono</option><option>Ottimo</option><option>Eccellente</option>
+      </select></div>
+
+    <div class="sl2">Foto del rilievo</div>
+    <div class="pa" id="rf-pazone">
+      <input type="file" id="rf-photoinput" accept="image/*" multiple capture="environment" style="display:none">
+      <div style="font-size:1.8rem">📷</div>
+      <p>Tocca per scattare o selezionare foto</p>
+    </div>
+    <div class="pp" id="rf-pp"></div>
+
+    <div class="fa">
+      <button class="bback" id="rf-back">← Indietro</button>
+      <button class="bsave g" id="rf-save">💾 Salva rilievo</button>
+      <button class="bdel" id="rf-del" style="display:none">🗑</button>
+    </div>
+    <div class="foot" style="margin-top:14px">💡 da un'idea di Stefano Stefanini</div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb">
+  <span class="lb-x" id="lb-x">✕</span>
+  <img id="lb-img" src="" alt="">
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  COSTANTI
+// ══════════════════════════════════════════
+var DB_KEY = 'fragole_v3';
+var DB_VERSION = 'v11_iframe';
+var DRIVE_URL = 'https://script.google.com/macros/s/AKfycbxyHvKNieniJebh3DNSfIY9nb7WdQ95Fd5C8FR7HRiBEq3--fS6Lw2s6No_6frsEHqUvA/exec';
+var CHECKS = ['profumo','dolce','acida','croccante','succosa','polpa','uniforme','lucida'];
+var TRIFIELDS = ['vigoria','resistenza','produttivita','conservabilita','trasportabilita','maturazione'];
+var TRI_LBL = {
+  vigoria:['Alta','Media','Bassa'],
+  resistenza:['Alta','Media','Bassa'],
+  produttivita:['Alta','Media','Bassa'],
+  conservabilita:['Alta','Media','Bassa'],
+  trasportabilita:['Alta','Media','Bassa'],
+  maturazione:['Precoce','Media','Tardiva']
+};
+var TRI_TITLE = {
+  vigoria:'Vigoria',resistenza:'Resist. malattie',produttivita:'Produttività',
+  conservabilita:'Conservabilità',trasportabilita:'Trasportabilità',maturazione:'Maturazione'
+};
+var CHECK_LBL = {
+  profumo:'🌸 Profumata',dolce:'🍯 Dolce',acida:'🍋 Acidula',croccante:'💪 Croccante',
+  succosa:'💧 Succosa',polpa:'❤️ Polpa rossa',uniforme:'📐 Uniforme',lucida:'✨ Lucida'
+};
+
+// ══════════════════════════════════════════
+//  DATABASE — salvataggio sicuro
+// ══════════════════════════════════════════
+var db = [];
+
+var PRELOADED = [{"id": "cbrbq5h667", "name": "Aprica", "code": "1", "fila": "11", "destino": "Collezione", "npiante": "20", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "xs5wztjj2o", "name": "Brilla", "code": "2", "fila": "11", "destino": "Collezione", "npiante": "20", "note_campo": "parzialmente morta", "rilievi": [{"id": "3dzuxs2ps9", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "364", "brix": "5.6", "durezza": "", "pesomedio": "32.7", "prodcum": "364", "precocita": "2026-05-03", "consistenza": "381", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 357 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "ilprslwkr6", "name": "Sibilla", "code": "3", "fila": "11", "destino": "Collezione", "npiante": "20", "note_campo": "", "rilievi": [{"id": "emrx7kyijl", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "85", "brix": "7.9", "durezza": "", "pesomedio": "45.5", "prodcum": "85", "precocita": "2026-05-04", "consistenza": "349", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 85 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "tngsfae03n", "name": "CNC 18,099,05", "code": "4", "fila": "11", "destino": "Collezione", "npiante": "20", "note_campo": "", "rilievi": [{"id": "aoyqmb8pty", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "211", "brix": "6.5", "durezza": "", "pesomedio": "18.3", "prodcum": "211", "precocita": "2026-05-02", "consistenza": "350", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 211 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "obcg1lw4es", "name": "FC 16,050,02", "code": "5", "fila": "11", "destino": "Collezione", "npiante": "20", "note_campo": "", "rilievi": [{"id": "8bavme6mvs", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "70", "brix": "6.3", "durezza": "", "pesomedio": "41.7", "prodcum": "70", "precocita": "2026-05-04", "consistenza": "393", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 70 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "p9ebo2w4m4", "name": "CNC 18,072,01", "code": "6", "fila": "11", "destino": "Collezione", "npiante": "20", "note_campo": "", "rilievi": [{"id": "tfoh5qsiuy", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "28", "brix": "", "durezza": "", "pesomedio": "48.2", "prodcum": "28", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 28 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "37hlsmiq7t", "name": "CNC 20,106,06", "code": "7", "fila": "11", "destino": "Collezione", "npiante": "20", "note_campo": "", "rilievi": [{"id": "1ucqfzbdq5", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "195", "brix": "7.1", "durezza": "", "pesomedio": "28.0", "prodcum": "195", "precocita": "2026-05-01", "consistenza": "380", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 195 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "jeb56mptz0", "name": "CNC 21,078,09", "code": "8", "fila": "11", "destino": "Collezione", "npiante": "10", "note_campo": "", "rilievi": [{"id": "k6oyzxnipz", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "130", "brix": "6.1", "durezza": "", "pesomedio": "44.5", "prodcum": "130", "precocita": "2026-05-03", "consistenza": "400", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 130 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "1f0iimalb4", "name": "Giusy", "code": "9", "fila": "10", "destino": "Collezione", "npiante": "20", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "2v5srfknjt", "name": "Elodì", "code": "10", "fila": "10", "destino": "Collezione", "npiante": "20", "note_campo": "parzialmente morta", "rilievi": [{"id": "7iisafan8g", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "214", "brix": "6.9", "durezza": "", "pesomedio": "34.2", "prodcum": "214", "precocita": "2026-05-03", "consistenza": "348", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 214 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "bzht7b7r6j", "name": "TEA", "code": "11", "fila": "10", "destino": "Collezione", "npiante": "20", "note_campo": "", "rilievi": [{"id": "zp1yzxvh4d", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "50", "brix": "7.2", "durezza": "", "pesomedio": "31.3", "prodcum": "50", "precocita": "2026-05-04", "consistenza": "323", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 50 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "yqk5lp6vlv", "name": "CNC 18,082,02", "code": "12", "fila": "10", "destino": "Collezione", "npiante": "20", "note_campo": "", "rilievi": [{"id": "sifpndnusi", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "110", "brix": "7.0", "durezza": "", "pesomedio": "35.3", "prodcum": "110", "precocita": "2026-05-04", "consistenza": "409", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 110 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "qb1mmmvyld", "name": "CNC 20,067,07", "code": "13", "fila": "10", "destino": "Collezione", "npiante": "20", "note_campo": "", "rilievi": [{"id": "y1tlwtv6xe", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "45", "brix": "5.9", "durezza": "", "pesomedio": "69.2", "prodcum": "45", "precocita": "2026-05-04", "consistenza": "378", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 45 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343817, "updatedAt": 1777932343817}, {"id": "xp241rrj6r", "name": "CNC 19,031,03", "code": "14", "fila": "10", "destino": "Collezione", "npiante": "20", "note_campo": "", "rilievi": [{"id": "z4xevbxj7x", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "45", "brix": "6.1", "durezza": "", "pesomedio": "36.0", "prodcum": "45", "precocita": "2026-05-04", "consistenza": "364", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 45 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "llc17gedjy", "name": "CNC 19,033,02", "code": "15", "fila": "10", "destino": "Collezione", "npiante": "17", "note_campo": "", "rilievi": [{"id": "9h07mukqdq", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "40", "brix": "6.8", "durezza": "", "pesomedio": "47.1", "prodcum": "40", "precocita": "2026-05-04", "consistenza": "374", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 40 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "r08l4qndkh", "name": "CNC 21,113,03", "code": "16", "fila": "10", "destino": "Collezione", "npiante": "10", "note_campo": "", "rilievi": [{"id": "801wj0waht", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "470", "brix": "6.4", "durezza": "", "pesomedio": "24.3", "prodcum": "470", "precocita": "2026-05-01", "consistenza": "531", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 470 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "53vl5q3kpk", "name": "CNC 21,116,03", "code": "17", "fila": "11", "destino": "VVVI", "npiante": "9", "note_campo": "", "rilievi": [{"id": "vw08gh7i7h", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "133", "brix": "6.0", "durezza": "", "pesomedio": "30.2", "prodcum": "133", "precocita": "2026-04-28", "consistenza": "374", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 133 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "phvzdnuopr", "name": "CNC 18,091,03", "code": "18", "fila": "11", "destino": "VVVI", "npiante": "10", "note_campo": "", "rilievi": [{"id": "kvggvxu81w", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "435", "brix": "", "durezza": "", "pesomedio": "28.8", "prodcum": "435", "precocita": "2026-04-29", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 435 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "91yhggy94s", "name": "CNC 20,215,07", "code": "19", "fila": "10", "destino": "VVVI", "npiante": "10", "note_campo": "", "rilievi": [{"id": "x1t7egal2o", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "125", "brix": "", "durezza": "", "pesomedio": "44.8", "prodcum": "125", "precocita": "2026-05-03", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 125 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "u42zj0zaji", "name": "CNC 18,078,03", "code": "20", "fila": "10", "destino": "VVVI", "npiante": "10", "note_campo": "", "rilievi": [{"id": "94o1fhehrk", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "45", "brix": "6.0", "durezza": "", "pesomedio": "28.1", "prodcum": "45", "precocita": "2026-05-04", "consistenza": "413", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 45 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "v9wim59mow", "name": "Joly", "code": "21", "fila": "11", "destino": "FC", "npiante": "8", "note_campo": "", "rilievi": [{"id": "kyuhprw3tv", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "173", "brix": "", "durezza": "", "pesomedio": "37.6", "prodcum": "173", "precocita": "2026-05-02", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 173 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "5qqzcw1g4y", "name": "Agnese", "code": "22", "fila": "11", "destino": "FC", "npiante": "8", "note_campo": "", "rilievi": [{"id": "jdp7ougyip", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "133", "brix": "", "durezza": "", "pesomedio": "36.4", "prodcum": "133", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 133 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "tyktmiaixa", "name": "DAFNE (CRAPO 14,132,31)", "code": "23", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "53i1g6vyye", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "400", "brix": "5.8", "durezza": "", "pesomedio": "28.6", "prodcum": "400", "precocita": "2026-04-30", "consistenza": "386", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 400 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "tti6jn0vpd", "name": "CRAPO 182,1", "code": "24", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "tn2zqs89x8", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "80", "brix": "5.8", "durezza": "", "pesomedio": "40.0", "prodcum": "80", "precocita": "2026-04-30", "consistenza": "400", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 80 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "fdtnkatyaj", "name": "CRAPO 135", "code": "25", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "q7h7udqjr1", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "267", "brix": "6.8", "durezza": "", "pesomedio": "34.3", "prodcum": "267", "precocita": "2026-05-03", "consistenza": "347", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 267 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "xxys4cr9oe", "name": "CREA 16,010,04 A", "code": "26", "fila": "11", "destino": "TARDIVA", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343818, "updatedAt": 1777932343818}, {"id": "s8rt3s2e02", "name": "CREA 18,026,07", "code": "27", "fila": "11", "destino": "TARDIVA", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "1so0epyxuy", "name": "CNC 21,104,01", "code": "28", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "anqev0obyo", "name": "CNC 21,078,06", "code": "29", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "ntmr481dba", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "367", "brix": "6.1", "durezza": "", "pesomedio": "30.5", "prodcum": "367", "precocita": "2026-05-02", "consistenza": "401", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 367 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "h8wl3n4dzr", "name": "CNC 21,118,10", "code": "30", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "0gy5fzu7vl", "name": "CNC 21,116,01", "code": "31", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "iypuq0kh3f", "name": "CNC 21,113,01", "code": "32", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "azs6jip51q", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "183", "brix": "6.1", "durezza": "", "pesomedio": "34.6", "prodcum": "183", "precocita": "2026-05-04", "consistenza": "343", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 183 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "6nc0njherg", "name": "CNC 21,130,02", "code": "33", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "5do7w8q3md", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "67", "brix": "5.8", "durezza": "", "pesomedio": "25.0", "prodcum": "67", "precocita": "2026-04-27", "consistenza": "563", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 67 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "d7yf01dqev", "name": "CNC 21,107,01", "code": "34", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "gkraxeh0lt", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "167", "brix": "6.8", "durezza": "", "pesomedio": "31.4", "prodcum": "167", "precocita": "2026-04-29", "consistenza": "412", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 167 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "m2ll669w3v", "name": "CNC 21,140,01", "code": "35", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "3t48u0rywx", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "56", "brix": "", "durezza": "", "pesomedio": "30.0", "prodcum": "56", "precocita": "2026-04-27", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 56 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "cohtcbiwac", "name": "CNC 21,078,01", "code": "36", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "q02lmfdl1c", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "56", "brix": "6.1", "durezza": "", "pesomedio": "40.0", "prodcum": "56", "precocita": "2026-04-30", "consistenza": "348", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 56 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "tuucsz7knc", "name": "CNC 20,067,04", "code": "37", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "l4g5kw9pbo", "name": "CNC 21,038,03", "code": "38", "fila": "11", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "s8epvgthhe", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "133", "brix": "7.2", "durezza": "", "pesomedio": "50.0", "prodcum": "133", "precocita": "2026-05-04", "consistenza": "490", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 133 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "gkg7e15gnh", "name": "CNC 18,109,02", "code": "39", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "3iqqsjkugp", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "27", "brix": "", "durezza": "", "pesomedio": "40.0", "prodcum": "27", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 27 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "aj8tqk8bfi", "name": "CNC 20,114,02", "code": "40", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "n1zu92qbfy", "name": "CNC 18,069,01", "code": "41", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "5je6ne0hjs", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "367", "brix": "6.3", "durezza": "", "pesomedio": "22.0", "prodcum": "367", "precocita": "2026-05-01", "consistenza": "309", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 367 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "ovhm6762s8", "name": "CNC 19,060,10", "code": "42", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "aowqyoalg4", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "", "brix": "5.3", "durezza": "", "pesomedio": "", "prodcum": "", "precocita": "", "consistenza": "393", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026.", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343819, "updatedAt": 1777932343819}, {"id": "8hqurph54l", "name": "CNC 20,113,03", "code": "43", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "1cg4qmf36i", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "367", "brix": "6.2", "durezza": "", "pesomedio": "30.1", "prodcum": "367", "precocita": "2026-05-03", "consistenza": "378", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 367 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "e6is5oetrf", "name": "CNC 19,109,19", "code": "44", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "b2ynj2vj9v", "name": "CNC 20,067,01", "code": "45", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "rlo49dvxu0", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "86", "brix": "7.0", "durezza": "", "pesomedio": "35.8", "prodcum": "86", "precocita": "2026-05-04", "consistenza": "526", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 86 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "tdx5alavq8", "name": "CNC 20,222,01", "code": "46", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "4rry8e5dqe", "name": "CNC 21,125,04KK", "code": "47", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "4qn577oo3x", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "58", "brix": "6.5", "durezza": "", "pesomedio": "31.8", "prodcum": "58", "precocita": "2026-05-04", "consistenza": "350", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 58 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "zl1xm8olih", "name": "CNC 21,117,01", "code": "48", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "chfttnid91", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "400", "brix": "6.9", "durezza": "", "pesomedio": "34.9", "prodcum": "400", "precocita": "2026-05-02", "consistenza": "377", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 400 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "w26pj43rk5", "name": "CNC 20,204,02", "code": "49", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "qmgul17udi", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "23", "brix": "", "durezza": "", "pesomedio": "20.0", "prodcum": "23", "precocita": "2026-04-27", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 23 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "xgajfo18vf", "name": "FC 12,028,02", "code": "50", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "jks9ae3f8e", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "183", "brix": "7.5", "durezza": "", "pesomedio": "33.3", "prodcum": "183", "precocita": "2026-05-04", "consistenza": "466", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 183 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "lvp3ehejqg", "name": "FC 06,034,02", "code": "51", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "s5n2bmzaip", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "167", "brix": "9.1", "durezza": "", "pesomedio": "20.0", "prodcum": "167", "precocita": "2026-05-04", "consistenza": "430", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 167 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "iikhcmxt90", "name": "CNC 21,079,09", "code": "52", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "j9lxk5gcwf", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "775", "brix": "5.7", "durezza": "", "pesomedio": "39.5", "prodcum": "775", "precocita": "2026-05-01", "consistenza": "334", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 775 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "s325s0u9y4", "name": "CNC 21,137,04", "code": "53", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "xaaeqbqlz3", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "117", "brix": "7.6", "durezza": "", "pesomedio": "43.8", "prodcum": "117", "precocita": "2026-05-04", "consistenza": "390", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 117 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "bdyche54yn", "name": "CNC 21,139,03", "code": "54", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "okvvt6bgjx", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "125", "brix": "", "durezza": "", "pesomedio": "24.2", "prodcum": "125", "precocita": "2026-04-27", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 125 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "l2zv7k2dbw", "name": "CNC 21,109,02", "code": "55", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "pq05pv68fi", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "133", "brix": "6.5", "durezza": "", "pesomedio": "34.8", "prodcum": "133", "precocita": "2026-04-30", "consistenza": "382", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 133 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343820, "updatedAt": 1777932343820}, {"id": "97aq29x6sn", "name": "CNC 21,117,03", "code": "56", "fila": "10", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "fdryen2jpj", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "117", "brix": "", "durezza": "", "pesomedio": "46.7", "prodcum": "117", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 117 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "ydrrqdmoie", "name": "CNC 21,140,01", "code": "57", "fila": "15", "destino": "FC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "kd7qenzpyh", "name": "CNC 22,032,01", "code": "58", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "v2wshf8t6h", "name": "CNC 22,034,01", "code": "59", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "m83jdejm84", "name": "CNC 22,034,02", "code": "60", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "ui1c3jwqmz", "name": "CNC 22,034,05", "code": "61", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "bhme1am74n", "name": "CNC 22,034,10", "code": "62", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "djuphqb4nv", "name": "CNC 22,034,09", "code": "63", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "x16ev7aduq", "name": "CNC 22,012,01", "code": "64", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "y89b7jvhda", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "545", "brix": "6.1", "durezza": "", "pesomedio": "24.8", "prodcum": "545", "precocita": "2026-05-01", "consistenza": "486", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 545 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "79ekluudk4", "name": "CNC 22,012,02", "code": "65", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "o69y2jq5b4", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "321", "brix": "7.8", "durezza": "", "pesomedio": "34.1", "prodcum": "321", "precocita": "2026-04-30", "consistenza": "483", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 321 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "6swnppfw0r", "name": "CNC 22,012,03", "code": "66", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "z54kmrzgxq", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "508", "brix": "6.8", "durezza": "", "pesomedio": "23.8", "prodcum": "508", "precocita": "2026-05-01", "consistenza": "427", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 508 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "hh07e4pik5", "name": "CNC 22,012,07", "code": "67", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "tmytkop36v", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "94", "brix": "6.4", "durezza": "", "pesomedio": "30.0", "prodcum": "94", "precocita": "2026-04-27", "consistenza": "622", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 94 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "dyfh5eghng", "name": "CNC 22,012,05", "code": "68", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "ftdcfzf4yy", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "21", "brix": "", "durezza": "", "pesomedio": "20.8", "prodcum": "21", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 21 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343821, "updatedAt": 1777932343821}, {"id": "xwc6g717u2", "name": "CNC 22,010,03", "code": "69", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "8rgpf7q5ay", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "217", "brix": "", "durezza": "", "pesomedio": "46.4", "prodcum": "217", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 217 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "8m9lyl5yy0", "name": "CNC 22,031,02", "code": "70", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "6u95fu0g0d", "name": "CNC 22,012,06", "code": "71", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "gjtqaaqt1a", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "433", "brix": "6.4", "durezza": "", "pesomedio": "33.5", "prodcum": "433", "precocita": "2026-05-01", "consistenza": "457", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 433 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "xv1w7b4gts", "name": "CNC 22,008,02", "code": "72", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "l4apxlbhr7", "name": "CNC 22,008,01", "code": "73", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "3l87b5xc68", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "233", "brix": "5.8", "durezza": "", "pesomedio": "29.4", "prodcum": "233", "precocita": "2026-05-03", "consistenza": "346", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 233 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "zvauy7i4f9", "name": "CNC 22,007,07", "code": "74", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "6hunm6c9or", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "157", "brix": "8.5", "durezza": "", "pesomedio": "31.8", "prodcum": "157", "precocita": "2026-05-03", "consistenza": "389", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 157 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "x5fl6av4id", "name": "CNC 22,007,01", "code": "75", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "mq42ia64ya", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "142", "brix": "7.5", "durezza": "", "pesomedio": "50.0", "prodcum": "142", "precocita": "2026-05-04", "consistenza": "330", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 142 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "clq9jg5684", "name": "CNC 22,007,02", "code": "76", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "v9js0o1z7c", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "150", "brix": "7.7", "durezza": "", "pesomedio": "29.2", "prodcum": "150", "precocita": "2026-05-01", "consistenza": "420", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 150 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "6u7do2mcu5", "name": "CNC 22,007,03", "code": "77", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "mo78s4bxqh", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "50", "brix": "", "durezza": "", "pesomedio": "30.8", "prodcum": "50", "precocita": "2026-04-27", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 50 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "vu5hdhvszs", "name": "CNC 22,004,03", "code": "78", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "advecnfjju", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "167", "brix": "5.7", "durezza": "", "pesomedio": "41.7", "prodcum": "167", "precocita": "2026-05-02", "consistenza": "349", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 167 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "5onijt0zhr", "name": "CNC 22,004,01", "code": "79", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "agbgpa7saw", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "167", "brix": "", "durezza": "", "pesomedio": "37.0", "prodcum": "167", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 167 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "84vvohk4jp", "name": "CNC 22,025,01", "code": "80", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "xxypyd2e2p", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "33", "brix": "", "durezza": "", "pesomedio": "40.0", "prodcum": "33", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 33 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "jy3igbf53q", "name": "CNC 22,025,02", "code": "81", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "6apdo8uiyw", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "58", "brix": "", "durezza": "", "pesomedio": "50.0", "prodcum": "58", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 58 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "7fb58shjr3", "name": "CNC 22,023,03", "code": "82", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "s4f4znawr6", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "13", "brix": "", "durezza": "", "pesomedio": "20.0", "prodcum": "13", "precocita": "2026-04-27", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 13 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "982b5728pa", "name": "CNC 22,023,01", "code": "83", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "6gl6vqnnwm", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "47", "brix": "", "durezza": "", "pesomedio": "40.0", "prodcum": "47", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 47 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "0uxlxvljul", "name": "CNC 22,023,07", "code": "84", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "0097a6lzyy", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "90", "brix": "8.4", "durezza": "", "pesomedio": "29.2", "prodcum": "90", "precocita": "2026-05-04", "consistenza": "447", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 90 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "416nbxyj4h", "name": "CNC 22,023,10", "code": "85", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "dksjg38nxp", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "108", "brix": "8.2", "durezza": "", "pesomedio": "28.3", "prodcum": "108", "precocita": "2026-05-04", "consistenza": "481", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 108 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "kv4fncn0wx", "name": "CNC 22,023,06", "code": "86", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "fiw95fl5wq", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "10", "brix": "", "durezza": "", "pesomedio": "20.0", "prodcum": "10", "precocita": "2026-04-27", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 10 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "rbr8wlql5t", "name": "CNC 22,023,11", "code": "87", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "y653pb2z9d", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "108", "brix": "7.2", "durezza": "", "pesomedio": "29.5", "prodcum": "108", "precocita": "2026-05-04", "consistenza": "487", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 108 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "emqwvsofaw", "name": "CNC 22,023,09", "code": "88", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "3f1774h4kk", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "147", "brix": "7.0", "durezza": "", "pesomedio": "23.9", "prodcum": "147", "precocita": "2026-05-02", "consistenza": "472", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 147 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "itfpih2ycu", "name": "CNC 22,023,08", "code": "89", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "gcbmfp8hlk", "name": "CNC 22,006,01", "code": "90", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "0b6fuppcor", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "117", "brix": "8.4", "durezza": "", "pesomedio": "30.4", "prodcum": "117", "precocita": "2026-05-04", "consistenza": "454", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 117 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "mq255l01lv", "name": "CNC 22,006,02", "code": "91", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "4pm5ww4h4y", "name": "CNC 22,020,02", "code": "92", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "1s4wd0vzax", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "37", "brix": "", "durezza": "", "pesomedio": "36.7", "prodcum": "37", "precocita": "2026-05-04", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 37 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "7jwcpy1dkp", "name": "CNC 22,020,01", "code": "93", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "t6yih509n4", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "233", "brix": "6.1", "durezza": "", "pesomedio": "50.3", "prodcum": "233", "precocita": "2026-05-02", "consistenza": "429", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 233 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343822, "updatedAt": 1777932343822}, {"id": "bconc16rip", "name": "CNC 22,013,03", "code": "94", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "n8ndpzxijw", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "225", "brix": "6.6", "durezza": "", "pesomedio": "28.1", "prodcum": "225", "precocita": "2026-05-02", "consistenza": "631", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 225 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "x0uwlnqnnn", "name": "CNC 22,013,01", "code": "95", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "yppmvhom53", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "267", "brix": "", "durezza": "", "pesomedio": "40.7", "prodcum": "267", "precocita": "2026-05-02", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 267 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "9ur30k6c7a", "name": "CNC 22,014,04", "code": "96", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "8em5io2jzb", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "81", "brix": "", "durezza": "", "pesomedio": "43.3", "prodcum": "81", "precocita": "2026-04-27", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 81 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "i6y1ap98rv", "name": "CNC 22,014,01", "code": "97", "fila": "15", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "w1m02h6s3g", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "19", "brix": "", "durezza": "", "pesomedio": "21.4", "prodcum": "19", "precocita": "2026-04-27", "consistenza": "", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 19 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "x3vron34ps", "name": "CNC 20,067,02", "code": "98", "fila": "15", "destino": "FC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "vtwg3hzovs", "name": "CNC 22,014,02", "code": "99", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "3exultwj99", "name": "CNC 22,001,01", "code": "100", "fila": "11", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "np36qe2njl", "name": "CNC 22,001,02", "code": "101", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "ttk0vkerkj", "name": "CNC 22,001,04", "code": "102", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "gqfijbejad", "name": "CNC 22,001,03", "code": "103", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "h5uc0evp8a", "name": "CNC 22,021,01", "code": "105", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "morta", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "d5jjcbn70y", "name": "CNC 22,033,01", "code": "106", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "aqo2bdss9e", "name": "CNC 22,024,01", "code": "107", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "3hzec6elto", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "100", "brix": "7.3", "durezza": "", "pesomedio": "46.2", "prodcum": "100", "precocita": "2026-05-04", "consistenza": "376", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 100 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "gosl0ytpb6", "name": "CNC 22,166,01", "code": "108", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "sk3703il7h", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "358", "brix": "6.5", "durezza": "", "pesomedio": "32.2", "prodcum": "358", "precocita": "2026-05-02", "consistenza": "310", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 358 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "zu0w3kvqsz", "name": "CNC 22,022,01", "code": "109", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "xkt3nu3mde", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "500", "brix": "5.9", "durezza": "", "pesomedio": "29.1", "prodcum": "500", "precocita": "2026-05-02", "consistenza": "357", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 500 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "u3s16w2b3b", "name": "CNC 22,016,01", "code": "110", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "rwdq5h41bj", "name": "CNC 22,030,01", "code": "111", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "fkz9gtdaww", "name": "CNC 22,009,02", "code": "112", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "c28j85qnys", "name": "CNC 22,017,02", "code": "113", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "gc0g1ggy8c", "name": "CNC 22,011,02", "code": "114", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "z0uca9wnd0", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "83", "brix": "6.6", "durezza": "", "pesomedio": "55.6", "prodcum": "83", "precocita": "2026-05-04", "consistenza": "504", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 83 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343823, "updatedAt": 1777932343823}, {"id": "k9ubg0rxjz", "name": "CNC 22,034,08 RIF", "code": "115", "fila": "14", "destino": "FC Nuova CNC", "npiante": "6", "note_campo": "", "rilievi": [{"id": "spu4rry4bu", "date": "2026-05-04", "op": "Az. Montanari", "rating": 0, "peso": "92", "brix": "6.5", "durezza": "", "pesomedio": "36.7", "prodcum": "92", "precocita": "2026-05-04", "consistenza": "356", "vivaio": "", "genitori": "", "forma": "", "colore": "", "dim": "", "stadio": "Piena maturazione", "cond": "", "note": "Dati campagna 2025/2026. Prod. commerciale: 92 g/pianta", "comm": "", "checks": {}, "tri": {}, "photos": []}], "createdAt": 1777932343823, "updatedAt": 1777932343823}];
+
+function loadDB() {
+  // Se la versione è cambiata, forza il caricamento dei dati precaricati
+  // ma salva prima i rilievi esistenti per non perderli
+  var storedVersion = localStorage.getItem('fragole_version');
+  try {
+    var raw = localStorage.getItem(DB_KEY);
+    if (raw && storedVersion === DB_VERSION) {
+      var parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) { db = parsed; return; }
+    }
+    // Nuova versione o primo avvio: carica le 114 varietà precaricate
+    // Preserva i rilievi esistenti se ci sono
+    var existingRilievi = {};
+    if (raw && storedVersion !== DB_VERSION) {
+      try {
+        var oldDb = JSON.parse(raw);
+        oldDb.forEach(function(v) {
+          if (v.rilievi && v.rilievi.length > 0) {
+            existingRilievi[v.name] = v.rilievi;
+          }
+        });
+      } catch(e) {}
+    }
+    db = JSON.parse(JSON.stringify(PRELOADED));
+    // Reattacca i rilievi esistenti alle varietà corrispondenti
+    db.forEach(function(v) {
+      if (existingRilievi[v.name]) {
+        v.rilievi = existingRilievi[v.name];
+      }
+    });
+    localStorage.setItem('fragole_version', DB_VERSION);
+    saveDB();
+  } catch(e) {
+    db = JSON.parse(JSON.stringify(PRELOADED));
+    localStorage.setItem('fragole_version', DB_VERSION);
+    saveDB();
+  }
+}
+
+function saveDB() {
+  try {
+    var data = JSON.stringify(db);
+    localStorage.setItem(DB_KEY, data);
+    syncToDrive(data);
+  } catch(e) {
+    toast('⚠️ Errore salvataggio locale');
+  }
+}
+
+function syncToDrive(data) {
+  if (!DRIVE_URL) return;
+  try {
+    var parsed = JSON.parse(data);
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      showDriveStatus('⚠️ Nessun dato da salvare');
+      return;
+    }
+    var count = parsed.length;
+    var encoded = btoa(unescape(encodeURIComponent(data)));
+
+    // Rimuovi iframe e form precedenti
+    var oldIframe = document.getElementById('drive-iframe');
+    if (oldIframe) oldIframe.parentNode.removeChild(oldIframe);
+    var oldForm = document.getElementById('drive-form');
+    if (oldForm) oldForm.parentNode.removeChild(oldForm);
+
+    // Crea iframe nascosto come target
+    var iframe = document.createElement('iframe');
+    iframe.id = 'drive-iframe';
+    iframe.name = 'drive-iframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    // Crea form che punta all'iframe
+    var form = document.createElement('form');
+    form.id = 'drive-form';
+    form.method = 'POST';
+    form.action = DRIVE_URL;
+    form.target = 'drive-iframe';
+    form.style.display = 'none';
+
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'data';
+    input.value = encoded;
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+
+    showDriveStatus('✅ Salvato su Drive (' + count + ' varietà)');
+  } catch(e) {
+    showDriveStatus('⚠️ Errore: ' + e.message);
+  }
+}
+
+function loadFromDrive() {
+  if (!DRIVE_URL) return;
+  showDriveStatus('🔄 Caricamento da Drive...');
+  fetch(DRIVE_URL + '?t=' + Date.now(), { method: 'GET', mode: 'cors' })
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
+      if (!text || text === '[]') {
+        showDriveStatus('☁️ Nessun dato su Drive');
+        return;
+      }
+      try {
+        var parsed = JSON.parse(text);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          db = parsed;
+          localStorage.setItem(DB_KEY, text);
+          localStorage.setItem('fragole_version', DB_VERSION);
+          renderList();
+          showDriveStatus('✅ Dati caricati da Drive (' + parsed.length + ' varietà)');
+        }
+      } catch(e) {
+        showDriveStatus('⚠️ Errore lettura Drive');
+      }
+    })
+    .catch(function() {
+      showDriveStatus('⚠️ Drive non raggiungibile');
+    });
+}
+
+var driveStatusTimer = null;
+function showDriveStatus(msg) {
+  var el = document.getElementById('drive-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.opacity = '1';
+  if (driveStatusTimer) clearTimeout(driveStatusTimer);
+  driveStatusTimer = setTimeout(function() {
+    el.style.opacity = '0';
+  }, 3000);
+}
+
+// ══════════════════════════════════════════
+//  STATO CORRENTE
+// ══════════════════════════════════════════
+var curId    = null;  // id varietà aperta
+var curRilId = null;  // id rilievo in modifica
+var rilRating = 0;
+var rilPhotos = [];
+var rilTri   = {};
+
+// ══════════════════════════════════════════
+//  NAVIGAZIONE
+// ══════════════════════════════════════════
+function showView(id) {
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goList() { showView('v-list'); renderList(); }
+function goDetail(id) {
+  if (id) curId = id;
+  showView('v-detail');
+  renderDetail();
+}
+
+// ══════════════════════════════════════════
+//  LISTA
+// ══════════════════════════════════════════
+function renderList() {
+  var q = (document.getElementById('search').value||'').toLowerCase();
+  var filtered = db.filter(function(c){
+    return !q || (c.name||'').toLowerCase().indexOf(q) >= 0 ||
+           (c.code||'').toLowerCase().indexOf(q) >= 0;
+  });
+  document.getElementById('hbadge').textContent = db.length;
+  document.getElementById('countbar').textContent =
+    filtered.length < db.length
+      ? filtered.length + ' di ' + db.length + ' varietà'
+      : db.length + ' varietà registrate';
+  document.getElementById('list-foot').style.display = db.length ? 'block' : 'none';
+
+  var list  = document.getElementById('card-list');
+  var empty = document.getElementById('empty');
+  if (!filtered.length) { list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  var html = '';
+  for (var i=0; i<filtered.length; i++) {
+    var c = filtered[i];
+    var rilievi = c.rilievi || [];
+    var rated   = rilievi.filter(function(r){ return r.rating > 0; });
+    var avg     = rated.length ? (rated.reduce(function(s,r){ return s+r.rating; },0)/rated.length).toFixed(1) : null;
+    var totalPeso = rilievi.reduce(function(s,r){ return s+(parseFloat(r.peso)||0); }, 0);
+
+    // foto dal primo rilievo che ne ha
+    var firstPhoto = null;
+    for (var j=0; j<rilievi.length; j++) {
+      if (rilievi[j].photos && rilievi[j].photos.length) { firstPhoto = rilievi[j].photos[0]; break; }
+    }
+    var thumb = firstPhoto
+      ? '<div class="vc-thumb"><img src="'+firstPhoto+'"></div>'
+      : '<div class="vc-thumb">🍓</div>';
+
+    // tags dal rilievo più recente
+    var lastRil = rilievi.length ? rilievi[rilievi.length-1] : null;
+    var activeTags = '';
+    if (lastRil && lastRil.checks) {
+      var keys = CHECKS.filter(function(k){ return lastRil.checks[k]; }).slice(0,4);
+      activeTags = keys.map(function(k){ return '<span class="tag tg">'+CHECK_LBL[k]+'</span>'; }).join('');
+    }
+
+    var avgHtml = avg
+      ? '<div class="vc-avg">★ '+avg+' media · '+rated.length+' rilievo'+(rated.length>1?'i':'')+(totalPeso?' · '+totalPeso+'g':'')+'</div>'
+      : '';
+    var meta = c.code ? 'ID: '+esc(c.code) : '';
+    var lastNote = lastRil && lastRil.note ? lastRil.note : '';
+
+    html += '<div class="vc" data-cid="'+c.id+'">'
+      + '<div class="vc-head">'+thumb
+      + '<div class="vc-info"><div class="vc-name">'+esc(c.name)+'</div>'
+      + (meta ? '<div class="vc-meta">'+meta+'</div>' : '')
+      + avgHtml+'</div>'
+      + '<div style="font-size:.72rem;color:var(--muted);flex-shrink:0">'+(rilievi.length?'📅'+rilievi.length:'')+'</div>'
+      + '</div>'
+      + (activeTags ? '<div class="vc-tags">'+activeTags+'</div>' : '')
+      + (lastNote ? '<div class="vc-note">'+esc(lastNote)+'</div>' : '')
+      + '</div>';
+  }
+  list.innerHTML = html;
+
+  // click handler robusto
+  document.querySelectorAll('.vc').forEach(function(el){
+    el.addEventListener('click', function(){
+      goDetail(el.getAttribute('data-cid'));
+    });
+  });
+}
+
+// ══════════════════════════════════════════
+//  DETTAGLIO VARIETÀ
+// ══════════════════════════════════════════
+function renderDetail() {
+  var c = db.find(function(x){ return x.id===curId; });
+  if (!c) { goList(); return; }
+
+  document.getElementById('d-name').textContent = c.name;
+  var sub = [];
+  if (c.code)    sub.push('Parc. '+c.code);
+  if (c.fila)    sub.push('Fila '+c.fila);
+  if (c.destino) sub.push(c.destino);
+  if (c.npiante) sub.push(c.npiante+' piante');
+  if (c.note_campo) sub.push('⚠️ '+c.note_campo);
+  document.getElementById('d-sub').textContent = sub.join(' · ');
+
+  document.getElementById('d-edit').onclick = function(){ openEditVarieta(curId); };
+  document.getElementById('d-del').onclick  = function(){ deleteVarieta(); };
+  document.getElementById('d-addrilievo').onclick = function(){ openNewRilievo(); };
+
+  // Media
+  var rilievi = (c.rilievi||[]).slice().sort(function(a,b){ return a.date.localeCompare(b.date); });
+  var rated   = rilievi.filter(function(r){ return r.rating>0; });
+  var avgBox  = document.getElementById('d-avg');
+  if (rated.length) {
+    var avg = rated.reduce(function(s,r){return s+r.rating;},0)/rated.length;
+    var totalPeso = rilievi.reduce(function(s,r){return s+(parseFloat(r.peso)||0);},0);
+    avgBox.style.display='flex';
+    var withBrix = rilievi.filter(function(r){ return parseFloat(r.brix)>0; });
+    var avgBrix = withBrix.length ? (withBrix.reduce(function(s,r){return s+(parseFloat(r.brix)||0);},0)/withBrix.length).toFixed(1) : null;
+    var withDur = rilievi.filter(function(r){ return parseFloat(r.durezza)>0; });
+    var avgDur = withDur.length ? (withDur.reduce(function(s,r){return s+(parseFloat(r.durezza)||0);},0)/withDur.length).toFixed(2) : null;
+    document.getElementById('d-avgnum').textContent   = avg.toFixed(1);
+    document.getElementById('d-avgstars').textContent = '🍓'.repeat(Math.round(avg));
+    document.getElementById('d-avgdet').textContent   = 'Su '+rated.length+' rilievo'+(rated.length>1?'i':'');
+    document.getElementById('d-avgpeso').textContent  = totalPeso ? '⚖️ Totale raccolto: '+totalPeso.toLocaleString('it-IT')+' g' : '';
+    document.getElementById('d-avgbrix').textContent  = avgBrix ? '🔬 Media Brix: '+avgBrix+' °Bx' : '';
+    document.getElementById('d-avgdurezza').textContent = avgDur ? '💪 Media Durezza: '+avgDur+' kg/cm²' : '';
+    var withPM = rilievi.filter(function(r){ return parseFloat(r.pesomedio)>0; });
+    var avgPM = withPM.length ? (withPM.reduce(function(s,r){return s+(parseFloat(r.pesomedio)||0);},0)/withPM.length).toFixed(1) : null;
+    var withPC = rilievi.filter(function(r){ return parseFloat(r.prodcum)>0; });
+    var avgPC = withPC.length ? (withPC.reduce(function(s,r){return s+(parseFloat(r.prodcum)||0);},0)/withPC.length).toFixed(0) : null;
+    var withCO = rilievi.filter(function(r){ return parseFloat(r.consistenza)>0; });
+    var avgCO = withCO.length ? (withCO.reduce(function(s,r){return s+(parseFloat(r.consistenza)||0);},0)/withCO.length).toFixed(0) : null;
+    document.getElementById('d-avgpesomedio').textContent  = avgPM ? '⚖️ Media peso frutto: '+avgPM+' g' : '';
+    document.getElementById('d-avgprodcum').textContent    = avgPC ? '📦 Media prod. cum.: '+avgPC+' g/pianta' : '';
+    document.getElementById('d-avgconsistenza').textContent= avgCO ? '💊 Media consistenza: '+avgCO+' g' : '';
+  } else {
+    avgBox.style.display='none';
+  }
+
+  // Rilievi (dal più recente)
+  var rilHtml = '';
+  var rDesc = rilievi.slice().reverse();
+  if (rDesc.length) {
+    for (var i=0; i<rDesc.length; i++) rilHtml += buildRilCard(rDesc[i]);
+  } else {
+    rilHtml = '<div style="font-size:.82rem;color:var(--muted);text-align:center;padding:20px 0">Nessun rilievo ancora. Premi ＋ per aggiungere il primo!</div>';
+  }
+  document.getElementById('d-rilievi').innerHTML = rilHtml;
+
+  // eventi sui rilievi
+  document.querySelectorAll('[data-action]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var a = btn.getAttribute('data-action');
+      var rid = btn.getAttribute('data-rid');
+      var src = btn.getAttribute('data-src');
+      if (a==='ril-edit') openEditRilievo(rid);
+      if (a==='ril-del')  confirmDelRilievo(rid);
+      if (a==='img')      openLB(src);
+    });
+  });
+}
+
+function buildRilCard(r) {
+  var d = r.date ? new Date(r.date+'T12:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+  var items = [];
+  if (r.peso)   items.push('<div class="kv"><span class="k">Peso: </span>⚖️ '+parseFloat(r.peso).toLocaleString('it-IT')+' g</div>');
+  if (r.brix)        items.push('<div class="kv"><span class="k">Brix: </span>'+parseFloat(r.brix).toFixed(1)+' °Bx</div>');
+  if (r.durezza)     items.push('<div class="kv"><span class="k">Durezza: </span>'+parseFloat(r.durezza).toFixed(2)+' kg/cm²</div>');
+  if (r.pesomedio)   items.push('<div class="kv"><span class="k">Peso medio: </span>'+parseFloat(r.pesomedio).toFixed(1)+' g</div>');
+  if (r.prodcum)     items.push('<div class="kv"><span class="k">Prod. cum.: </span>'+parseFloat(r.prodcum).toFixed(0)+' g/pianta</div>');
+  if (r.consistenza) items.push('<div class="kv"><span class="k">Consistenza: </span>'+parseFloat(r.consistenza).toFixed(0)+' g</div>');
+  if (r.precocita)   items.push('<div class="kv"><span class="k">Precocità: </span>'+new Date(r.precocita+'T12:00:00').toLocaleDateString("it-IT",{day:"2-digit",month:"long"})+'</div>');
+  if (r.vivaio)      items.push('<div class="kv"><span class="k">Vivaio: </span>'+esc(r.vivaio)+'</div>');
+  if (r.genitori)    items.push('<div class="kv"><span class="k">Genitori: </span>'+esc(r.genitori)+'</div>');
+  if (r.forma)  items.push('<div class="kv"><span class="k">Forma: </span>'+esc(r.forma)+'</div>');
+  if (r.colore) items.push('<div class="kv"><span class="k">Colore: </span>'+esc(r.colore)+'</div>');
+  if (r.dim)    items.push('<div class="kv"><span class="k">Dim: </span>'+esc(r.dim)+'</div>');
+  if (r.stadio) items.push('<div class="kv"><span class="k">Stadio: </span>'+esc(r.stadio)+'</div>');
+  if (r.cond)   items.push('<div class="kv"><span class="k">Cond: </span>'+esc(r.cond)+'</div>');
+  if (r.op)     items.push('<div class="kv"><span class="k">Operatore: </span>'+esc(r.op)+'</div>');
+  if (r.comm)   items.push('<div class="kv"><span class="k">Commerciale: </span>'+esc(r.comm)+'</div>');
+
+  // checks
+  var chkHtml = '';
+  if (r.checks) {
+    var ac = CHECKS.filter(function(k){ return r.checks[k]; });
+    if (ac.length) chkHtml = '<div class="rc-checks">'+ac.map(function(k){
+      return '<span class="tag tg">'+CHECK_LBL[k]+'</span>';
+    }).join('')+'</div>';
+  }
+
+  // tri
+  var triHtml = '';
+  if (r.tri) {
+    var triItems = TRIFIELDS.map(function(f){
+      var v = r.tri[f]; if (!v) return '';
+      var lbl = v==='y'?TRI_LBL[f][0]:v==='m'?TRI_LBL[f][1]:TRI_LBL[f][2];
+      var cls = v==='y'?'y':v==='n'?'n':'m';
+      return '<div class="tri-di"><span class="tl">'+TRI_TITLE[f]+'</span><span class="tv '+cls+'">'+lbl+'</span></div>';
+    }).filter(Boolean).join('');
+    if (triItems) triHtml = '<div class="tri-disp">'+triItems+'</div>';
+  }
+
+  // photos
+  var photosHtml = '';
+  if (r.photos && r.photos.length) {
+    photosHtml = '<div class="rc-photos">'+r.photos.map(function(p){
+      return '<img src="'+p+'" data-action="img" data-src="'+p+'">';
+    }).join('')+'</div>';
+  }
+
+  return '<div class="rc">'
+    +'<div class="rc-head">'
+    +'<div><div class="rc-date">📅 '+d+'</div>'
+    +(r.rating ? '<div class="rc-rating">'+'🍓'.repeat(r.rating)+' ('+r.rating+'/5)</div>' : '')
+    +'</div>'
+    +'<div class="rc-acts">'
+    +'<button class="sml" data-action="ril-edit" data-rid="'+r.id+'">✏️</button>'
+    +'<button class="sml del" data-action="ril-del" data-rid="'+r.id+'">🗑</button>'
+    +'</div></div>'
+    +'<div class="rc-body">'
+    +(items.length ? '<div class="rc-row">'+items.join('')+'</div>' : '')
+    +chkHtml
+    +triHtml
+    +(r.note ? '<div class="rc-note">'+esc(r.note)+'</div>' : '')
+    +photosHtml
+    +'</div></div>';
+}
+
+// ══════════════════════════════════════════
+//  FORM VARIETÀ
+// ══════════════════════════════════════════
+function openNewVarieta() {
+  curId = null;
+  document.getElementById('vf-icon').textContent  = '📋';
+  document.getElementById('vf-title').textContent = 'Nuova Varietà';
+  document.getElementById('vf-name').value = '';
+  document.getElementById('vf-code').value = '';
+  document.getElementById('vf-del').style.display = 'none';
+  showView('v-varform');
+}
+function openEditVarieta(id) {
+  var c = db.find(function(x){ return x.id===id; });
+  if (!c) return;
+  curId = id;
+  document.getElementById('vf-icon').textContent  = '✏️';
+  document.getElementById('vf-title').textContent = c.name || 'Modifica';
+  document.getElementById('vf-name').value = c.name || '';
+  document.getElementById('vf-code').value = c.code || '';
+  if(document.getElementById('vf-fila'))     document.getElementById('vf-fila').value     = c.fila      || '';
+  if(document.getElementById('vf-destino'))  document.getElementById('vf-destino').value  = c.destino   || '';
+  if(document.getElementById('vf-npiante'))  document.getElementById('vf-npiante').value  = c.npiante   || '';
+  if(document.getElementById('vf-genitori')) document.getElementById('vf-genitori').value = c.genitori  || '';
+  if(document.getElementById('vf-notecampo'))document.getElementById('vf-notecampo').value= c.note_campo|| '';
+  document.getElementById('vf-del').style.display = 'block';
+  showView('v-varform');
+}
+function saveVarieta() {
+  var name = document.getElementById('vf-name').value.trim();
+  if (!name) { toast('⚠️ Inserisci il nome della varietà'); return; }
+  var code = document.getElementById('vf-code').value.trim();
+
+  if (curId) {
+    // modifica
+    var idx = db.findIndex(function(x){ return x.id===curId; });
+    if (idx !== -1) {
+      db[idx].name       = name;
+      db[idx].code       = code;
+      db[idx].fila       = document.getElementById('vf-fila')      ? document.getElementById('vf-fila').value.trim()      : (db[idx].fila||'');
+      db[idx].destino    = document.getElementById('vf-destino')   ? document.getElementById('vf-destino').value.trim()   : (db[idx].destino||'');
+      db[idx].npiante    = document.getElementById('vf-npiante')   ? document.getElementById('vf-npiante').value          : (db[idx].npiante||'');
+      db[idx].genitori   = document.getElementById('vf-genitori')  ? document.getElementById('vf-genitori').value.trim()  : (db[idx].genitori||'');
+      db[idx].note_campo = document.getElementById('vf-notecampo') ? document.getElementById('vf-notecampo').value.trim() : (db[idx].note_campo||'');
+      db[idx].updatedAt  = Date.now();
+    }
+  } else {
+    // nuova
+    var rec = { id: uid(), name: name, code: code,
+      fila:      document.getElementById('vf-fila')     ? document.getElementById('vf-fila').value.trim()     : '',
+      destino:   document.getElementById('vf-destino')  ? document.getElementById('vf-destino').value.trim()  : '',
+      npiante:   document.getElementById('vf-npiante')  ? document.getElementById('vf-npiante').value         : '',
+      genitori:  document.getElementById('vf-genitori') ? document.getElementById('vf-genitori').value.trim() : '',
+      note_campo:document.getElementById('vf-notecampo')? document.getElementById('vf-notecampo').value.trim(): '',
+      rilievi: [], createdAt: Date.now(), updatedAt: Date.now() };
+    db.unshift(rec);
+    curId = rec.id;
+  }
+  saveDB();
+  toast('✅ Varietà salvata!');
+  setTimeout(function(){ goDetail(curId); }, 300);
+}
+function deleteVarieta() {
+  if (!curId) return;
+  if (!confirm('Eliminare questa varietà e tutti i rilievi?')) return;
+  db = db.filter(function(x){ return x.id !== curId; });
+  saveDB();
+  toast('🗑 Varietà eliminata');
+  setTimeout(goList, 300);
+}
+
+// ══════════════════════════════════════════
+//  FORM RILIEVO
+// ══════════════════════════════════════════
+function openNewRilievo() {
+  curRilId  = null;
+  rilRating = 0;
+  rilPhotos = [];
+  rilTri    = {};
+  clearRilForm();
+  document.getElementById('rf-title').textContent = 'Nuovo Rilievo';
+  document.getElementById('rf-del').style.display = 'none';
+  document.getElementById('rf-date').value = todayStr();
+  showView('v-rilform');
+}
+function openEditRilievo(rid) {
+  var c = db.find(function(x){ return x.id===curId; });
+  if (!c) return;
+  var r = (c.rilievi||[]).find(function(x){ return x.id===rid; });
+  if (!r) return;
+  curRilId  = rid;
+  rilRating = r.rating || 0;
+  rilPhotos = (r.photos || []).slice();
+  rilTri    = Object.assign({}, r.tri || {});
+  clearRilForm();
+  document.getElementById('rf-title').textContent = 'Modifica Rilievo';
+  document.getElementById('rf-del').style.display = 'block';
+  document.getElementById('rf-date').value  = r.date    || '';
+  document.getElementById('rf-op').value    = r.op      || '';
+  document.getElementById('rf-peso').value  = r.peso    || '';
+  document.getElementById('rf-brix').value       = r.brix       || '';
+  document.getElementById('rf-durezza').value    = r.durezza    || '';
+  document.getElementById('rf-pesomedio').value  = r.pesomedio  || '';
+  document.getElementById('rf-prodcum').value    = r.prodcum    || '';
+  document.getElementById('rf-precocita').value  = r.precocita  || '';
+  document.getElementById('rf-consistenza').value= r.consistenza|| '';
+  document.getElementById('rf-vivaio').value     = r.vivaio     || '';
+  document.getElementById('rf-genitori').value   = r.genitori   || '';
+  document.getElementById('rf-forma').value = r.forma   || '';
+  document.getElementById('rf-colore').value= r.colore  || '';
+  document.getElementById('rf-dim').value   = r.dim     || '';
+  document.getElementById('rf-stadio').value= r.stadio  || '';
+  document.getElementById('rf-cond').value  = r.cond    || '';
+  document.getElementById('rf-note').value  = r.note    || '';
+  document.getElementById('rf-comm').value  = r.comm    || '';
+  CHECKS.forEach(function(k){
+    var el = document.getElementById('rc-'+k);
+    if (el) el.checked = !!((r.checks||{})[k]);
+  });
+  setRilRating(rilRating);
+  // tri
+  document.querySelectorAll('#rf-trizone .tb').forEach(function(btn){
+    var f = btn.getAttribute('data-f');
+    var v = btn.getAttribute('data-v');
+    btn.classList.toggle('on', rilTri[f]===v);
+  });
+  renderRilPhotos();
+  showView('v-rilform');
+}
+function clearRilForm() {
+  ['rf-date','rf-op','rf-peso','rf-brix','rf-durezza','rf-pesomedio','rf-prodcum','rf-precocita','rf-consistenza','rf-vivaio','rf-genitori','rf-forma','rf-colore','rf-dim','rf-stadio','rf-cond','rf-note','rf-comm']
+    .forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  CHECKS.forEach(function(k){ var el=document.getElementById('rc-'+k); if(el) el.checked=false; });
+  document.querySelectorAll('#rf-rrow .rb').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('#rf-trizone .tb').forEach(function(b){ b.classList.remove('on'); });
+  document.getElementById('rf-pp').innerHTML = '';
+}
+function setRilRating(v) {
+  rilRating = v;
+  document.querySelectorAll('#rf-rrow .rb').forEach(function(b){
+    b.classList.toggle('on', parseInt(b.getAttribute('data-v'))===v);
+  });
+}
+function saveRilievo() {
+  var date = document.getElementById('rf-date').value;
+  if (!date) { toast('⚠️ Inserisci la data del rilievo'); return; }
+  var c = db.find(function(x){ return x.id===curId; });
+  if (!c) { toast('❌ Varietà non trovata'); return; }
+  if (!c.rilievi) c.rilievi = [];
+
+  var checks = {};
+  CHECKS.forEach(function(k){
+    var el = document.getElementById('rc-'+k);
+    checks[k] = el ? el.checked : false;
+  });
+
+  var rec = {
+    id:      curRilId || uid(),
+    date:    date,
+    op:      document.getElementById('rf-op').value.trim(),
+    rating:  rilRating,
+    peso:    document.getElementById('rf-peso').value || '',
+    brix:        document.getElementById('rf-brix').value        || '',
+    durezza:     document.getElementById('rf-durezza').value     || '',
+    pesomedio:   document.getElementById('rf-pesomedio').value   || '',
+    prodcum:     document.getElementById('rf-prodcum').value     || '',
+    precocita:   document.getElementById('rf-precocita').value   || '',
+    consistenza: document.getElementById('rf-consistenza').value || '',
+    vivaio:      document.getElementById('rf-vivaio').value      || '',
+    genitori:    document.getElementById('rf-genitori').value    || '',
+    forma:   document.getElementById('rf-forma').value,
+    colore:  document.getElementById('rf-colore').value,
+    dim:     document.getElementById('rf-dim').value,
+    stadio:  document.getElementById('rf-stadio').value,
+    cond:    document.getElementById('rf-cond').value,
+    note:    document.getElementById('rf-note').value.trim(),
+    comm:    document.getElementById('rf-comm').value,
+    checks:  checks,
+    tri:     Object.assign({}, rilTri),
+    photos:  rilPhotos.slice()
+  };
+
+  if (curRilId) {
+    var idx = c.rilievi.findIndex(function(x){ return x.id===curRilId; });
+    if (idx !== -1) c.rilievi[idx] = rec; else c.rilievi.push(rec);
+  } else {
+    c.rilievi.push(rec);
+  }
+  c.updatedAt = Date.now();
+  saveDB();
+  toast('✅ Rilievo salvato!');
+  setTimeout(function(){ goDetail(curId); }, 300);
+}
+function confirmDelRilievo(rid) {
+  if (!confirm('Eliminare questo rilievo?')) return;
+  var c = db.find(function(x){ return x.id===curId; });
+  if (!c) return;
+  c.rilievi = (c.rilievi||[]).filter(function(x){ return x.id!==rid; });
+  saveDB();
+  toast('🗑 Rilievo eliminato');
+  renderDetail();
+}
+function deleteRilievo() {
+  if (curRilId) confirmDelRilievo(curRilId);
+}
+
+// ══════════════════════════════════════════
+//  FOTO RILIEVO
+// ══════════════════════════════════════════
+function renderRilPhotos() {
+  var pp = document.getElementById('rf-pp');
+  pp.innerHTML = rilPhotos.map(function(src,i){
+    return '<div class="ptw"><img class="pth" src="'+src+'">'
+      +'<button class="pdel" data-pi="'+i+'">✕</button></div>';
+  }).join('');
+  pp.querySelectorAll('.pdel').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      rilPhotos.splice(parseInt(btn.getAttribute('data-pi')),1);
+      renderRilPhotos();
+    });
+  });
+}
+
+// ══════════════════════════════════════════
+//  LIGHTBOX
+// ══════════════════════════════════════════
+function openLB(src) {
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lb').classList.add('open');
+}
+function closeLB() {
+  document.getElementById('lb').classList.remove('open');
+  document.getElementById('lb-img').src = '';
+}
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+var toastTimer = null;
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 2500);
+}
+
+// ══════════════════════════════════════════
+//  EXPORT / IMPORT
+// ══════════════════════════════════════════
+function doExport() {
+  var blob = new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'fragole-'+todayStr()+'.json';
+  a.click();
+}
+document.getElementById('fimp').addEventListener('change', function(evt){
+  var file = evt.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      var imp = JSON.parse(e.target.result);
+      if (!Array.isArray(imp)) throw 0;
+      var existing = new Set(db.map(function(c){ return c.id; }));
+      var added = 0;
+      imp.forEach(function(c){ if(!existing.has(c.id)){ db.push(c); added++; } });
+      saveDB(); renderList();
+      toast('✅ Importate '+added+' schede');
+    } catch(e){ toast('❌ File non valido'); }
+  };
+  reader.readAsText(file);
+  evt.target.value = '';
+});
+
+// ══════════════════════════════════════════
+//  UTILITY
+// ══════════════════════════════════════════
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+// ══════════════════════════════════════════
+//  WIRING EVENTI
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function(){
+  loadDB();
+
+  // Form varietà
+  document.getElementById('vf-save').addEventListener('click', saveVarieta);
+  document.getElementById('vf-del').addEventListener('click', deleteVarieta);
+  document.getElementById('vf-back').addEventListener('click', function(){
+    if (curId) goDetail(curId); else goList();
+  });
+
+  // Form rilievo — rating
+  document.querySelectorAll('#rf-rrow .rb').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      setRilRating(parseInt(btn.getAttribute('data-v')));
+    });
+  });
+
+  // Form rilievo — tri
+  document.querySelectorAll('#rf-trizone .tb').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var f = btn.getAttribute('data-f');
+      var v = btn.getAttribute('data-v');
+      if (rilTri[f]===v) { rilTri[f]=null; btn.classList.remove('on'); return; }
+      rilTri[f] = v;
+      document.querySelectorAll('#rf-trizone .tb[data-f="'+f+'"]')
+        .forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+    });
+  });
+
+  // Form rilievo — foto
+  document.getElementById('rf-pazone').addEventListener('click', function(){
+    document.getElementById('rf-photoinput').click();
+  });
+  document.getElementById('rf-photoinput').addEventListener('change', function(evt){
+    Array.from(evt.target.files).forEach(function(f){
+      var reader = new FileReader();
+      reader.onload = function(e){ rilPhotos.push(e.target.result); renderRilPhotos(); };
+      reader.readAsDataURL(f);
+    });
+    evt.target.value = '';
+  });
+
+  // Form rilievo — salva / back / del
+  document.getElementById('rf-save').addEventListener('click', saveRilievo);
+  document.getElementById('rf-del').addEventListener('click', deleteRilievo);
+  document.getElementById('rf-back').addEventListener('click', function(){
+    goDetail(curId);
+  });
+
+  // Lightbox
+  document.getElementById('lb').addEventListener('click', closeLB);
+  document.getElementById('lb-x').addEventListener('click', closeLB);
+
+  goList();
+  // Sincronizza su Drive all'avvio se ci sono dati
+  if (db.length > 0) {
+    setTimeout(function(){
+      syncToDrive(JSON.stringify(db));
+    }, 2000);
+  }
+});
+</script>
+</body>
+</html>

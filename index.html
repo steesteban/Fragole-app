@@ -505,7 +505,7 @@ header h1{font-family:'Playfair Display',serif;font-size:1.25rem;display:flex;al
 //  COSTANTI
 // ══════════════════════════════════════════
 var DB_KEY = 'fragole_v3';
-var DB_VERSION = 'v13_jsonbin';
+var DB_VERSION = 'v14_feedback';
 var BIN_ID  = '69fbb9b4250b1311c31393c6';
 var API_KEY = '$2a$10$gW3wvCedeUvjNr96pqDgfOS81vW2Gjs8n2q43YWFMTGSALVvubPhW';
 var BIN_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
@@ -588,10 +588,11 @@ function syncToDrive(data) {
   try {
     var parsed = JSON.parse(data);
     if (!Array.isArray(parsed) || parsed.length === 0) {
-      showDriveStatus('⚠️ Nessun dato da salvare');
+      showDriveStatus('⚠️ Nessun dato da salvare', true);
       return;
     }
     var count = parsed.length;
+    showDriveStatus('🔄 Salvataggio in corso...', true);
     fetch(BIN_URL, {
       method: 'PUT',
       headers: {
@@ -600,19 +601,18 @@ function syncToDrive(data) {
       },
       body: data
     })
-    .then(function(r) { return r.json(); })
-    .then(function(res) {
-      if (res.metadata || res.record) {
-        showDriveStatus('✅ Salvato (' + count + ' varietà)');
-      } else {
-        showDriveStatus('⚠️ Risposta inattesa');
-      }
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
     })
-    .catch(function() {
-      showDriveStatus('⚠️ Salvataggio non riuscito');
+    .then(function(res) {
+      showDriveStatus('✅ Salvato (' + count + ' varietà)', true);
+    })
+    .catch(function(err) {
+      showDriveStatus('⚠️ Errore: ' + err.message, true);
     });
   } catch(e) {
-    showDriveStatus('⚠️ Errore: ' + e.message);
+    showDriveStatus('⚠️ Errore: ' + e.message, true);
   }
 }
 
@@ -641,15 +641,16 @@ function loadFromDrive() {
 }
 
 var driveStatusTimer = null;
-function showDriveStatus(msg) {
+function showDriveStatus(msg, persistent) {
   var el = document.getElementById('drive-status');
   if (!el) return;
   el.textContent = msg;
   el.style.opacity = '1';
   if (driveStatusTimer) clearTimeout(driveStatusTimer);
+  var delay = persistent ? 5000 : 3000;
   driveStatusTimer = setTimeout(function() {
     el.style.opacity = '0';
-  }, 3000);
+  }, delay);
 }
 
 // ══════════════════════════════════════════

@@ -227,7 +227,7 @@ header h1{font-family:'Playfair Display',serif;font-size:1.25rem;display:flex;al
 <header>
   <h1>🍓 Fragole <span class="badge" id="hbadge">0</span></h1>
   <div class="hbtns">
-    <button class="hbtn" onclick="loadFromDrive()">☁️ Sync</button>
+    <button class="hbtn" onclick="manualSync()">☁️ Sync</button>
     <button class="hbtn" onclick="doExport()">⬇ Esporta</button>
     <button class="hbtn" onclick="document.getElementById('fimp').click()">⬆ Importa</button>
     <input type="file" id="fimp" accept=".json" style="display:none">
@@ -505,7 +505,7 @@ header h1{font-family:'Playfair Display',serif;font-size:1.25rem;display:flex;al
 //  COSTANTI
 // ══════════════════════════════════════════
 var DB_KEY = 'fragole_v3';
-var DB_VERSION = 'v14_feedback';
+var DB_VERSION = 'v15_merge';
 var BIN_ID  = '69fbb9b4250b1311c31393c6';
 var API_KEY = '$2a$10$gW3wvCedeUvjNr96pqDgfOS81vW2Gjs8n2q43YWFMTGSALVvubPhW';
 var BIN_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
@@ -617,27 +617,59 @@ function syncToDrive(data) {
 }
 
 function loadFromDrive() {
-  showDriveStatus('🔄 Caricamento...');
+  showDriveStatus('🔄 Caricamento...', true);
   fetch(BIN_URL + '/latest', {
     method: 'GET',
     headers: { 'X-Master-Key': API_KEY }
   })
   .then(function(r) { return r.json(); })
   .then(function(res) {
-    var data = res.record;
-    if (!data || !Array.isArray(data) || data.length === 0 || (data.length === 1 && data[0].init)) {
-      showDriveStatus('☁️ Nessun dato salvato ancora');
+    var remote = res.record;
+    if (!remote || !Array.isArray(remote) || remote.length === 0 || (remote.length === 1 && remote[0].init)) {
+      showDriveStatus('☁️ Nessun dato remoto', true);
       return;
     }
-    db = data;
+    // MERGE: per ogni varietà prende i rilievi più numerosi tra locale e remoto
+    var localMap = {};
+    db.forEach(function(v) { localMap[v.id] = v; });
+    var remoteMap = {};
+    remote.forEach(function(v) { remoteMap[v.id] = v; });
+    // Unisci: parti dal remoto, aggiungi rilievi locali se più recenti
+    var merged = remote.map(function(rv) {
+      var lv = localMap[rv.id];
+      if (!lv) return rv;
+      var lRilievi = lv.rilievi || [];
+      var rRilievi = rv.rilievi || [];
+      // Prendi l'insieme più completo di rilievi
+      if (lRilievi.length >= rRilievi.length) {
+        rv.rilievi = lRilievi;
+      }
+      return rv;
+    });
+    // Aggiungi varietà locali non presenti nel remoto
+    db.forEach(function(lv) {
+      if (!remoteMap[lv.id]) merged.push(lv);
+    });
+    db = merged;
     localStorage.setItem(DB_KEY, JSON.stringify(db));
     localStorage.setItem('fragole_version', DB_VERSION);
     renderList();
-    showDriveStatus('✅ Caricato (' + db.length + ' varietà)');
+    // Salva il merge su JSONBin
+    syncToDrive(JSON.stringify(db));
+    showDriveStatus('✅ Sincronizzato (' + db.length + ' varietà)', true);
   })
   .catch(function() {
-    showDriveStatus('⚠️ Caricamento non riuscito');
+    showDriveStatus('⚠️ Caricamento non riuscito', true);
   });
+}
+
+// Sync manuale: salva i dati locali su JSONBin (PUSH)
+function manualSync() {
+  if (db.length === 0) {
+    showDriveStatus('⚠️ Nessun dato da sincronizzare', true);
+    return;
+  }
+  syncToDrive(JSON.stringify(db));
 }
 
 var driveStatusTimer = null;

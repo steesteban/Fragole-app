@@ -505,7 +505,7 @@ header h1{font-family:'Playfair Display',serif;font-size:1.25rem;display:flex;al
 //  COSTANTI
 // ══════════════════════════════════════════
 var DB_KEY = 'fragole_v3';
-var DB_VERSION = 'v15_merge';
+var DB_VERSION = 'v16_photos';
 var BIN_ID  = '69fbb9b4250b1311c31393c6';
 var API_KEY = '$2a$10$gW3wvCedeUvjNr96pqDgfOS81vW2Gjs8n2q43YWFMTGSALVvubPhW';
 var BIN_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
@@ -1212,6 +1212,31 @@ function todayStr() { return new Date().toISOString().split('T')[0]; }
 // ══════════════════════════════════════════
 //  WIRING EVENTI
 // ══════════════════════════════════════════
+// Comprime foto a max 800px e qualità 70% — riduce da ~3MB a ~100KB
+function compressPhoto(file, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var MAX = 800;
+      var w = img.width;
+      var h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else       { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width  = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.70));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 document.addEventListener('DOMContentLoaded', function(){
   loadDB();
 
@@ -1248,9 +1273,10 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   document.getElementById('rf-photoinput').addEventListener('change', function(evt){
     Array.from(evt.target.files).forEach(function(f){
-      var reader = new FileReader();
-      reader.onload = function(e){ rilPhotos.push(e.target.result); renderRilPhotos(); };
-      reader.readAsDataURL(f);
+      compressPhoto(f, function(compressed) {
+        rilPhotos.push(compressed);
+        renderRilPhotos();
+      });
     });
     evt.target.value = '';
   });
